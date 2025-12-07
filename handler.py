@@ -133,7 +133,7 @@ def load_workflow(workflow_path):
 
 def handler(job):
     job_input = job.get("input", {})
-    logger.info(f"🚀 FAST ENDPOINT (1.3B) - Received job")
+    logger.info(f"🚀 FAST ENDPOINT (5B I2V) - Received job")
 
     task_id = f"task_{uuid.uuid4()}"
 
@@ -207,6 +207,16 @@ def handler(job):
         lora_slot = 1
     else:
         logger.info("⚠️ No Lightning LoRA - using 20 steps")
+    
+    # Apply NSFW LoRA if available and enabled
+    nsfw_lora_path = "/ComfyUI/models/loras/wan22_5b_nsfw.safetensors"
+    use_nsfw_lora = job_input.get("use_nsfw_lora", True)  # Enabled by default
+    if use_nsfw_lora and os.path.exists(nsfw_lora_path):
+        nsfw_strength = job_input.get("nsfw_lora_strength", 0.8)
+        prompt["279"]["inputs"][f"lora_{lora_slot}"] = "wan22_5b_nsfw.safetensors"
+        prompt["279"]["inputs"][f"strength_{lora_slot}"] = nsfw_strength
+        logger.info(f"🔥 NSFW LoRA enabled @ {nsfw_strength}")
+        lora_slot += 1
     
     # Apply custom LoRAs
     lora_pairs = job_input.get("lora_pairs", [])

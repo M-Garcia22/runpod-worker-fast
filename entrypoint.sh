@@ -45,10 +45,11 @@ echo "============================================"
 download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_ti2v_5B_fp16.safetensors" \
     "/ComfyUI/models/diffusion_models/wan2.2_ti2v_5B_fp16.safetensors"
 
-# Lightning LoRA for 5B (optional - faster inference with fewer steps)
-# Note: If this fails, the endpoint will still work with more steps
-download_model "https://huggingface.co/lightx2v/Wan2.2-Lightning/resolve/main/Wan2.2-I2V-5B-lora-4step-bf16.safetensors" \
-    "/ComfyUI/models/loras/wan22_5b_lightning.safetensors" || echo "⚠️ Lightning LoRA not found - will use more steps"
+# Note: No Lightning LoRA available for 5B yet - using 20 steps
+
+# NSFW LoRA for 5B (from CivitAI - Wan 2.2 5B compatible)
+download_model "https://civitai.com/api/download/models/2165401?type=Model&format=SafeTensor" \
+    "/ComfyUI/models/loras/wan22_5b_nsfw.safetensors"
 
 # Shared components (same as 14B)
 download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" \

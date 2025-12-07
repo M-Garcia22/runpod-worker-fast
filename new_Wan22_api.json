@@ -135,12 +135,12 @@
   },
   "220": {
     "inputs": {
-      "steps": 6,
-      "cfg": 3.0,
+      "steps": 20,
+      "cfg": 5.0,
       "shift": 8.0,
       "seed": 12345,
       "force_offload": false,
-      "scheduler": "dpm++_2m",
+      "scheduler": "euler",
       "riflex_freq_index": 0,
       "denoise_strength": 1,
       "batched_cfg": false,
