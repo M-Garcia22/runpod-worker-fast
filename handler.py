@@ -153,11 +153,15 @@ def handler(job):
     prompt = load_workflow("/new_Wan22_api.json")
     
     # ============================================
-    # FAST DEFAULTS for 5B I2V model
+    # FAST DEFAULTS for 5B TI2V model
     # ============================================
+    # Check if Lightning LoRA exists (allows fewer steps)
+    lightning_lora_path = "/ComfyUI/models/loras/wan22_5b_lightning.safetensors"
+    has_lightning = os.path.exists(lightning_lora_path)
+    
     length = job_input.get("length", 65)      # 4 seconds at 16fps
-    steps = job_input.get("steps", 6)         # Lightning LoRA allows 4-6 steps
-    cfg = job_input.get("cfg", 3.0)           # Lower CFG works better with Lightning
+    steps = job_input.get("steps", 6 if has_lightning else 20)  # 6 with Lightning, 20 without
+    cfg = job_input.get("cfg", 3.0 if has_lightning else 5.0)   # Lower CFG with Lightning
     
     # Context optimization for speed
     context_frames = job_input.get("context_frames", 65)
@@ -193,20 +197,27 @@ def handler(job):
     prompt["498"]["inputs"]["context_stride"] = context_stride
     
     # LoRA support
-    # Default: Lightning LoRA is already set in workflow (lora_0)
-    # Additional LoRAs can be added via lora_pairs
+    lora_slot = 0
     
+    # Apply Lightning LoRA if available
+    if has_lightning:
+        prompt["279"]["inputs"]["lora_0"] = "wan22_5b_lightning.safetensors"
+        prompt["279"]["inputs"]["strength_0"] = 1.0
+        logger.info("⚡ Lightning LoRA enabled - using 6 steps")
+        lora_slot = 1
+    else:
+        logger.info("⚠️ No Lightning LoRA - using 20 steps")
+    
+    # Apply custom LoRAs
     lora_pairs = job_input.get("lora_pairs", [])
-    
-    # Apply custom LoRAs (starting from lora_1 since lora_0 is Lightning)
     if lora_pairs:
-        for i, lora_pair in enumerate(lora_pairs[:3]):  # Max 3 custom (lora_1, lora_2, lora_3)
+        for i, lora_pair in enumerate(lora_pairs[:4 - lora_slot]):
             lora_name = lora_pair.get("name") or lora_pair.get("high")
             lora_weight = lora_pair.get("weight") or lora_pair.get("high_weight", 1.0)
             if lora_name:
-                prompt["279"]["inputs"][f"lora_{i+1}"] = lora_name
-                prompt["279"]["inputs"][f"strength_{i+1}"] = lora_weight
-                logger.info(f"LoRA {i+1}: {lora_name} @ {lora_weight}")
+                prompt["279"]["inputs"][f"lora_{i + lora_slot}"] = lora_name
+                prompt["279"]["inputs"][f"strength_{i + lora_slot}"] = lora_weight
+                logger.info(f"LoRA {i + lora_slot}: {lora_name} @ {lora_weight}")
                 
     # Connect to ComfyUI
     ws_url = f"ws://{server_address}:8188/ws?clientId={client_id}"
