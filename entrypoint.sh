@@ -41,11 +41,7 @@ echo "FAST ENDPOINT - Downloading 1.3B models..."
 echo "This will download ~8 GB (vs 42GB for 14B)"
 echo "============================================"
 
-# 1.3B I2V Model (FP16 - small enough to not need FP8)
-download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/diffusion_models/wan2.1_i2v_480p_14B_fp8_scaled.safetensors" \
-    "/ComfyUI/models/diffusion_models/wan2.1_i2v_480p_14B_fp8_scaled.safetensors"
-
-# Actually let's use the proper 1.3B model
+# 1.3B I2V Model (bf16 - small and fast!)
 download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2.1_I2V_1.3B_bf16.safetensors" \
     "/ComfyUI/models/diffusion_models/Wan2.1_I2V_1.3B_bf16.safetensors"
 

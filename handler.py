@@ -55,7 +55,7 @@ def process_input(input_data, temp_dir, output_filename, input_type):
         return save_base64_to_file(input_data, temp_dir, output_filename)
     else:
         raise Exception(f"Unsupported input type: {input_type}")
-
+        
 def download_file_from_url(url, output_path):
     """Download file from URL"""
     try:
@@ -86,7 +86,7 @@ def save_base64_to_file(base64_data, temp_dir, output_filename):
         return file_path
     except (binascii.Error, ValueError) as e:
         raise Exception(f"Base64 decode failed: {e}")
-
+    
 def queue_prompt(prompt):
     url = f"http://{server_address}:8188/prompt"
     logger.info(f"Queueing prompt to: {url}")
@@ -134,7 +134,7 @@ def load_workflow(workflow_path):
 def handler(job):
     job_input = job.get("input", {})
     logger.info(f"🚀 FAST ENDPOINT (1.3B) - Received job")
-    
+
     task_id = f"task_{uuid.uuid4()}"
 
     # Process image input
@@ -202,7 +202,7 @@ def handler(job):
                 prompt["279"]["inputs"][f"lora_{i}"] = lora_name
                 prompt["279"]["inputs"][f"strength_{i}"] = lora_weight
                 logger.info(f"LoRA {i}: {lora_name} @ {lora_weight}")
-
+                
     # Connect to ComfyUI
     ws_url = f"ws://{server_address}:8188/ws?clientId={client_id}"
     http_url = f"http://{server_address}:8188/"
@@ -236,7 +236,7 @@ def handler(job):
     generation_time = time.time() - start_time
     
     ws.close()
-    
+
     logger.info(f"⚡ FAST generation complete in {generation_time:.1f}s")
 
     for node_id in videos:
