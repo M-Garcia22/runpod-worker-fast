@@ -128,6 +128,21 @@ if [ $wait_count -ge $max_wait ]; then
     exit 1
 fi
 
+# Validate workflow against ComfyUI's actual node definitions
+echo "============================================"
+echo "Validating workflow against ComfyUI nodes..."
+echo "============================================"
+python /validate_workflow.py
+if [ $? -ne 0 ]; then
+    echo "❌ Workflow validation failed! Check node definitions above."
+    echo "The workflow JSON needs to be updated to match ComfyUI's API."
+    # Don't exit - let user see the errors in logs
+    # But also print the fix guidance
+    echo ""
+    echo "📋 To fix: Update new_CogVideoX_api.json based on the node definitions printed above."
+    echo ""
+fi
+
 # Start the handler
 echo "Starting FAST handler (CogVideoX-5B I2V)..."
 exec python handler.py

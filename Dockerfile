@@ -57,6 +57,7 @@ RUN mkdir -p /ComfyUI/models/CogVideo && \
     mkdir -p /ComfyUI/models/diffusion_models && \
     mkdir -p /ComfyUI/models/loras && \
     mkdir -p /ComfyUI/models/clip_vision && \
+    mkdir -p /ComfyUI/models/clip && \
     mkdir -p /ComfyUI/models/text_encoders && \
     mkdir -p /ComfyUI/models/vae
 
