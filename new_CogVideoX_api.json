@@ -3,7 +3,6 @@
     "inputs": {
       "model": "THUDM/CogVideoX-5b-I2V",
       "precision": "bf16",
-      "fp8_fastmode": false,
       "load_device": "main_device",
       "enable_sequential_cpu_offload": false,
       "attention_mode": "sdpa"
@@ -82,7 +81,7 @@
   },
   "7": {
     "inputs": {
-      "enable_vae_tiling": true,
+      "enable_tiling": true,
       "start_image": [
         "6",
         0
@@ -154,10 +153,6 @@
       "loop_count": 0,
       "filename_prefix": "CogVideoX_I2V",
       "format": "video/h264-mp4",
-      "pix_fmt": "yuv420p",
-      "crf": 19,
-      "save_metadata": true,
-      "trim_to_audio": false,
       "pingpong": false,
       "save_output": true,
       "images": [
