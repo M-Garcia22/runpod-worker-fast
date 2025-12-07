@@ -68,6 +68,34 @@ except Exception as e:
     fi
 fi
 
+# Download T5-XXL text encoder for CogVideoTextEncode
+echo "📦 Checking T5-XXL text encoder..."
+T5_PATH="/ComfyUI/models/clip/t5xxl_fp16.safetensors"
+if [ -f "$T5_PATH" ]; then
+    echo "✓ T5-XXL already exists"
+else
+    mkdir -p /ComfyUI/models/clip
+    echo "📦 Downloading T5-XXL text encoder..."
+    python -c "
+from huggingface_hub import hf_hub_download
+import os
+
+print('Downloading T5-XXL fp16...')
+hf_hub_download(
+    repo_id='comfyanonymous/flux_text_encoders',
+    filename='t5xxl_fp16.safetensors',
+    local_dir='/ComfyUI/models/clip',
+    local_dir_use_symlinks=False
+)
+print('✓ T5-XXL downloaded!')
+"
+    if [ $? -eq 0 ]; then
+        echo "✓ T5-XXL downloaded successfully"
+    else
+        echo "⚠ T5-XXL download failed"
+    fi
+fi
+
 echo "============================================"
 echo "Model check complete. Starting ComfyUI..."
 echo "============================================"

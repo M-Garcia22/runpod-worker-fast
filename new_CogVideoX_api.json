@@ -13,13 +13,23 @@
       "title": "Download & Load CogVideoX-5B I2V"
     }
   },
+  "2": {
+    "inputs": {
+      "clip_name": "t5xxl_fp16.safetensors",
+      "type": "sd3"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load T5-XXL CLIP"
+    }
+  },
   "3": {
     "inputs": {
       "prompt": "A woman smiling naturally, cinematic lighting",
       "strength": 1,
       "force_offload": false,
-      "pipeline": [
-        "1",
+      "clip": [
+        "2",
         0
       ]
     },
@@ -33,8 +43,8 @@
       "prompt": "blurry, distorted, low quality, static, ugly",
       "strength": 1,
       "force_offload": false,
-      "pipeline": [
-        "1",
+      "clip": [
+        "2",
         0
       ]
     },
@@ -73,7 +83,7 @@
   "7": {
     "inputs": {
       "enable_vae_tiling": true,
-      "image": [
+      "start_image": [
         "6",
         0
       ],
@@ -89,15 +99,12 @@
   },
   "8": {
     "inputs": {
-      "height": 480,
-      "width": 720,
       "num_frames": 81,
       "steps": 50,
       "cfg": 6,
       "seed": 12345,
       "scheduler": "CogVideoXDPMScheduler",
-      "denoise_strength": 1,
-      "pipeline": [
+      "model": [
         "1",
         0
       ],
@@ -109,7 +116,7 @@
         "4",
         0
       ],
-      "samples": [
+      "image_cond_latents": [
         "7",
         0
       ]
@@ -122,6 +129,11 @@
   "9": {
     "inputs": {
       "enable_vae_tiling": true,
+      "auto_tile_size": true,
+      "tile_sample_min_width": 360,
+      "tile_sample_min_height": 240,
+      "tile_overlap_factor_width": 0.2,
+      "tile_overlap_factor_height": 0.2,
       "samples": [
         "8",
         0
