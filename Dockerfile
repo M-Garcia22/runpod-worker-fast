@@ -44,6 +44,9 @@ RUN cd /ComfyUI/custom_nodes && \
 # SPEED OPTIMIZATIONS (added by OpenMind)
 # ============================================
 
+# SageAttention - 1.5x faster attention (requires Triton)
+RUN pip install sageattention triton
+
 # Torch compile optimization (enable in environment)
 ENV TORCH_COMPILE_ENABLED=1
 ENV TORCH_COMPILE_MODE=reduce-overhead

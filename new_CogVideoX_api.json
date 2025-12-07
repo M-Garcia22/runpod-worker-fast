@@ -5,7 +5,7 @@
       "precision": "bf16",
       "load_device": "main_device",
       "enable_sequential_cpu_offload": false,
-      "attention_mode": "sdpa"
+      "attention_mode": "sage_attn"
     },
     "class_type": "DownloadAndLoadCogVideoModel",
     "_meta": {
@@ -109,7 +109,7 @@
   "8": {
     "inputs": {
       "num_frames": 81,
-      "steps": 20,
+      "steps": 15,
       "cfg": 6,
       "seed": 12345,
       "scheduler": "CogVideoXDPMScheduler",
