@@ -12,6 +12,17 @@
       "title": "Download & Load CogVideoX-5B I2V"
     }
   },
+  "11": {
+    "inputs": {
+      "rel_l1_thresh": 0.2,
+      "cache_interval": 4,
+      "coefficients": "1.05, 1.05, 1.05, 1.05"
+    },
+    "class_type": "CogVideoXFasterCache",
+    "_meta": {
+      "title": "FasterCache (2-3x Speed)"
+    }
+  },
   "2": {
     "inputs": {
       "clip_name": "t5xxl_fp16.safetensors",
@@ -98,7 +109,7 @@
   "8": {
     "inputs": {
       "num_frames": 81,
-      "steps": 50,
+      "steps": 20,
       "cfg": 6,
       "seed": 12345,
       "scheduler": "CogVideoXDPMScheduler",
@@ -117,11 +128,15 @@
       "image_cond_latents": [
         "7",
         0
+      ],
+      "fastercache": [
+        "11",
+        0
       ]
     },
     "class_type": "CogVideoSampler",
     "_meta": {
-      "title": "CogVideo Sampler"
+      "title": "CogVideo Sampler + FasterCache"
     }
   },
   "9": {
@@ -148,7 +163,7 @@
   },
   "10": {
     "inputs": {
-      "frame_rate": 30,
+      "frame_rate": 16,
       "loop_count": 0,
       "filename_prefix": "CogVideoX_I2V",
       "format": "video/h264-mp4",
