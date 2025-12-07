@@ -5,7 +5,7 @@
       "precision": "bf16",
       "load_device": "main_device",
       "enable_sequential_cpu_offload": false,
-      "attention_mode": "sage_attn"
+      "attention_mode": "sageattn"
     },
     "class_type": "DownloadAndLoadCogVideoModel",
     "_meta": {
@@ -17,7 +17,7 @@
       "start_step": 0,
       "hf_step": 5,
       "lf_step": 10,
-      "cache_device": "cuda",
+      "cache_device": "main_device",
       "num_blocks_to_cache": 12
     },
     "class_type": "CogVideoXFasterCache",
