@@ -1,0 +1,161 @@
+{
+  "1": {
+    "inputs": {
+      "model": "zai-org/CogVideoX-5b-I2V",
+      "precision": "bf16",
+      "fp8_fastmode": false,
+      "load_device": "main_device",
+      "enable_sequential_cpu_offload": false,
+      "attention_mode": "sdpa"
+    },
+    "class_type": "DownloadAndLoadCogVideoModel",
+    "_meta": {
+      "title": "Download & Load CogVideoX-5B I2V"
+    }
+  },
+  "3": {
+    "inputs": {
+      "prompt": "A woman smiling naturally, cinematic lighting",
+      "strength": 1,
+      "force_offload": false,
+      "pipeline": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "CogVideoTextEncode",
+    "_meta": {
+      "title": "CogVideo Text Encode"
+    }
+  },
+  "4": {
+    "inputs": {
+      "prompt": "blurry, distorted, low quality, static, ugly",
+      "strength": 1,
+      "force_offload": false,
+      "pipeline": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "CogVideoTextEncode",
+    "_meta": {
+      "title": "CogVideo Negative Encode"
+    }
+  },
+  "5": {
+    "inputs": {
+      "image": "input.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Input Image"
+    }
+  },
+  "6": {
+    "inputs": {
+      "width": 720,
+      "height": 480,
+      "upscale_method": "lanczos",
+      "keep_proportion": true,
+      "divisible_by": 16,
+      "crop": "center",
+      "image": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "ImageResizeKJ",
+    "_meta": {
+      "title": "Resize Image to 720x480"
+    }
+  },
+  "7": {
+    "inputs": {
+      "enable_vae_tiling": true,
+      "image": [
+        "6",
+        0
+      ],
+      "vae": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "CogVideoImageEncode",
+    "_meta": {
+      "title": "CogVideo I2V Image Encode"
+    }
+  },
+  "8": {
+    "inputs": {
+      "height": 480,
+      "width": 720,
+      "num_frames": 49,
+      "steps": 50,
+      "cfg": 6,
+      "seed": 12345,
+      "scheduler": "CogVideoXDPMScheduler",
+      "denoise_strength": 1,
+      "pipeline": [
+        "1",
+        0
+      ],
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "4",
+        0
+      ],
+      "samples": [
+        "7",
+        0
+      ]
+    },
+    "class_type": "CogVideoSampler",
+    "_meta": {
+      "title": "CogVideo Sampler"
+    }
+  },
+  "9": {
+    "inputs": {
+      "enable_vae_tiling": true,
+      "samples": [
+        "8",
+        0
+      ],
+      "vae": [
+        "1",
+        1
+      ]
+    },
+    "class_type": "CogVideoDecode",
+    "_meta": {
+      "title": "CogVideo Decode"
+    }
+  },
+  "10": {
+    "inputs": {
+      "frame_rate": 8,
+      "loop_count": 0,
+      "filename_prefix": "CogVideoX_I2V",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 19,
+      "save_metadata": true,
+      "trim_to_audio": false,
+      "pingpong": false,
+      "save_output": true,
+      "images": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "VHS_VideoCombine",
+    "_meta": {
+      "title": "Video Combine"
+    }
+  }
+}

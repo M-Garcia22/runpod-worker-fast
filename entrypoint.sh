@@ -1,66 +1,54 @@
 #!/bin/bash
 
 # ============================================
-# FAST ENDPOINT - Wan2.2 5B I2V Model
-# 2-3x faster than 14B, with Image-to-Video!
+# FAST ENDPOINT - CogVideoX-5B I2V Model
+# ~2x faster than Wan 14B, proper Image-to-Video!
 # ============================================
 
 set -e
 
-# Function to download models with retry logic
-download_model() {
-    local url=$1
-    local output=$2
-    local max_attempts=5
-    local attempt=1
+echo "============================================"
+echo "FAST ENDPOINT - Downloading CogVideoX-5B I2V..."
+echo "This will download ~21.6 GB total"
+echo "============================================"
+
+# ============================================
+# Download from zai-org repository (working mirror)
+# https://huggingface.co/zai-org/CogVideoX-5b-I2V
+# Using huggingface-cli for proper caching
+# ============================================
+
+# Set HuggingFace cache directory
+export HF_HOME=/root/.cache/huggingface
+mkdir -p $HF_HOME
+
+# Check if model already cached
+if [ -d "$HF_HOME/hub/models--zai-org--CogVideoX-5b-I2V" ]; then
+    echo "✓ CogVideoX-5B I2V already cached"
+else
+    echo "📦 Downloading CogVideoX-5B I2V via huggingface-cli..."
     
-    # Skip if file already exists
-    if [ -f "$output" ]; then
-        echo "✓ Model already exists: $(basename $output)"
-        return 0
+    # Download full model repo to HuggingFace cache
+    # This ensures ComfyUI's from_pretrained() finds it
+    python -c "
+from huggingface_hub import snapshot_download
+import os
+
+print('Downloading zai-org/CogVideoX-5b-I2V...')
+snapshot_download(
+    repo_id='zai-org/CogVideoX-5b-I2V',
+    local_dir_use_symlinks=False,
+    resume_download=True
+)
+print('✓ Download complete!')
+"
+    
+    if [ $? -eq 0 ]; then
+        echo "✓ CogVideoX-5B I2V downloaded successfully"
+    else
+        echo "⚠ HuggingFace download failed, ComfyUI will download on first run"
     fi
-    
-    while [ $attempt -le $max_attempts ]; do
-        echo "Download attempt $attempt/$max_attempts: $(basename $output)"
-        if wget --timeout=600 --tries=3 --retry-connrefused --continue -q "$url" -O "$output"; then
-            echo "✓ Download successful: $(basename $output)"
-            return 0
-        else
-            echo "✗ Download failed (attempt $attempt/$max_attempts), retrying in 15 seconds..."
-            sleep 15
-            attempt=$((attempt + 1))
-        fi
-    done
-    echo "ERROR: Failed to download after $max_attempts attempts: $(basename $output)"
-    return 1
-}
-
-# Download 5B I2V model (faster than 14B, supports Image-to-Video!)
-echo "============================================"
-echo "FAST ENDPOINT - Downloading 5B I2V models..."
-echo "This will download ~15 GB (vs 42GB for 14B)"
-echo "============================================"
-
-# Wan 2.2 5B TI2V Model (Text/Image to Video)
-download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_ti2v_5B_fp16.safetensors" \
-    "/ComfyUI/models/diffusion_models/wan2.2_ti2v_5B_fp16.safetensors"
-
-# Note: No Lightning LoRA available for 5B yet - using 20 steps
-
-# NSFW LoRA for 5B (from CivitAI - Wan 2.2 5B compatible)
-# Note: CivitAI downloads may fail without auth - endpoint will still work without it
-download_model "https://civitai.com/api/download/models/2165401?type=Model&format=SafeTensor" \
-    "/ComfyUI/models/loras/wan22_5b_nsfw.safetensors" || echo "⚠️ NSFW LoRA download failed - will run without it"
-
-# Shared components (same as 14B)
-download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" \
-    "/ComfyUI/models/clip_vision/clip_vision_h.safetensors"
-
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5-xxl-enc-bf16.safetensors" \
-    "/ComfyUI/models/text_encoders/umt5-xxl-enc-bf16.safetensors"
-
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1_VAE_bf16.safetensors" \
-    "/ComfyUI/models/vae/Wan2_1_VAE_bf16.safetensors"
+fi
 
 echo "============================================"
 echo "Model check complete. Starting ComfyUI..."
@@ -72,12 +60,12 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:512
 export TORCH_CUDNN_V8_API_ENABLED=1
 
 # Start ComfyUI in the background with optimizations
-echo "Starting ComfyUI (FAST mode)..."
-python /ComfyUI/main.py --listen --use-sage-attention --fast &
+echo "Starting ComfyUI (CogVideoX FAST mode)..."
+python /ComfyUI/main.py --listen --fast &
 
 # Wait for ComfyUI to be ready
 echo "Waiting for ComfyUI to be ready..."
-max_wait=120
+max_wait=300
 wait_count=0
 while [ $wait_count -lt $max_wait ]; do
     if curl -s http://127.0.0.1:8188/ > /dev/null 2>&1; then
@@ -95,5 +83,5 @@ if [ $wait_count -ge $max_wait ]; then
 fi
 
 # Start the handler
-echo "Starting FAST handler (5B I2V model)..."
+echo "Starting FAST handler (CogVideoX-5B I2V)..."
 exec python handler.py
