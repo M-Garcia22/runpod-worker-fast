@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================
-# FAST ENDPOINT - Wan2.1 1.3B Model
-# 5-6x faster than 14B, good quality with LoRAs
+# FAST ENDPOINT - Wan2.2 5B I2V Model
+# 2-3x faster than 14B, with Image-to-Video!
 # ============================================
 
 set -e
@@ -35,15 +35,19 @@ download_model() {
     return 1
 }
 
-# Download 1.3B models (much smaller than 14B!)
+# Download 5B I2V model (faster than 14B, supports Image-to-Video!)
 echo "============================================"
-echo "FAST ENDPOINT - Downloading 1.3B models..."
-echo "This will download ~8 GB (vs 42GB for 14B)"
+echo "FAST ENDPOINT - Downloading 5B I2V models..."
+echo "This will download ~15 GB (vs 42GB for 14B)"
 echo "============================================"
 
-# 1.3B I2V Model (bf16 - small and fast!)
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2.1_I2V_1.3B_bf16.safetensors" \
-    "/ComfyUI/models/diffusion_models/Wan2.1_I2V_1.3B_bf16.safetensors"
+# Wan 2.2 5B I2V Model (FP8 quantized for speed)
+download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2.2_I2V_5B_fp8_scaled.safetensors" \
+    "/ComfyUI/models/diffusion_models/Wan2.2_I2V_5B_fp8_scaled.safetensors"
+
+# Lightning LoRA for 5B (faster inference with fewer steps)
+download_model "https://huggingface.co/lightx2v/Wan2.2-Lightning/resolve/main/Wan2.2-I2V-5B-lora-4step-bf16.safetensors" \
+    "/ComfyUI/models/loras/wan22_5b_lightning.safetensors"
 
 # Shared components (same as 14B)
 download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" \
@@ -88,5 +92,5 @@ if [ $wait_count -ge $max_wait ]; then
 fi
 
 # Start the handler
-echo "Starting FAST handler (1.3B model)..."
+echo "Starting FAST handler (5B I2V model)..."
 exec python handler.py

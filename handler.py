@@ -14,8 +14,8 @@ import time
 import torch
 
 # ============================================
-# FAST ENDPOINT - Wan2.1 1.3B Model
-# 5-6x faster than 14B
+# FAST ENDPOINT - Wan2.2 5B I2V Model
+# 2-3x faster than 14B, with Image-to-Video!
 # ============================================
 
 if torch.cuda.is_available():
@@ -153,18 +153,18 @@ def handler(job):
     prompt = load_workflow("/new_Wan22_api.json")
     
     # ============================================
-    # FAST DEFAULTS for 1.3B model
+    # FAST DEFAULTS for 5B I2V model
     # ============================================
-    length = job_input.get("length", 49)      # 3 seconds (vs 81 for 14B)
-    steps = job_input.get("steps", 20)        # 1.3B needs more steps (no Lightning LoRA)
-    cfg = job_input.get("cfg", 5.0)           # CFG scale
+    length = job_input.get("length", 65)      # 4 seconds at 16fps
+    steps = job_input.get("steps", 6)         # Lightning LoRA allows 4-6 steps
+    cfg = job_input.get("cfg", 3.0)           # Lower CFG works better with Lightning
     
     # Context optimization for speed
-    context_frames = job_input.get("context_frames", 49)
-    context_overlap = job_input.get("context_overlap", 16)
+    context_frames = job_input.get("context_frames", 65)
+    context_overlap = job_input.get("context_overlap", 24)
     context_stride = job_input.get("context_stride", 4)
     
-    logger.info(f"🎞️ FAST: {length} frames, {steps} steps, cfg={cfg}")
+    logger.info(f"🎞️ FAST 5B I2V: {length} frames, {steps} steps, cfg={cfg}")
     logger.info(f"📐 Context: {context_frames}f/{context_overlap}overlap/{context_stride}stride")
 
     # Apply to workflow
@@ -192,16 +192,21 @@ def handler(job):
     prompt["498"]["inputs"]["context_overlap"] = context_overlap
     prompt["498"]["inputs"]["context_stride"] = context_stride
     
-    # LoRA support (for quality boost)
+    # LoRA support
+    # Default: Lightning LoRA is already set in workflow (lora_0)
+    # Additional LoRAs can be added via lora_pairs
+    
     lora_pairs = job_input.get("lora_pairs", [])
+    
+    # Apply custom LoRAs (starting from lora_1 since lora_0 is Lightning)
     if lora_pairs:
-        for i, lora_pair in enumerate(lora_pairs[:4]):
+        for i, lora_pair in enumerate(lora_pairs[:3]):  # Max 3 custom (lora_1, lora_2, lora_3)
             lora_name = lora_pair.get("name") or lora_pair.get("high")
             lora_weight = lora_pair.get("weight") or lora_pair.get("high_weight", 1.0)
             if lora_name:
-                prompt["279"]["inputs"][f"lora_{i}"] = lora_name
-                prompt["279"]["inputs"][f"strength_{i}"] = lora_weight
-                logger.info(f"LoRA {i}: {lora_name} @ {lora_weight}")
+                prompt["279"]["inputs"][f"lora_{i+1}"] = lora_name
+                prompt["279"]["inputs"][f"strength_{i+1}"] = lora_weight
+                logger.info(f"LoRA {i+1}: {lora_name} @ {lora_weight}")
                 
     # Connect to ComfyUI
     ws_url = f"ws://{server_address}:8188/ws?clientId={client_id}"
@@ -237,14 +242,14 @@ def handler(job):
     
     ws.close()
 
-    logger.info(f"⚡ FAST generation complete in {generation_time:.1f}s")
+    logger.info(f"⚡ FAST 5B I2V generation complete in {generation_time:.1f}s")
 
     for node_id in videos:
         if videos[node_id]:
             return {
                 "video": videos[node_id][0],
                 "generation_time": generation_time,
-                "model": "1.3B",
+                "model": "5B_I2V",
                 "frames": length,
                 "steps": steps
             }

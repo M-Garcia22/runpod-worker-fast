@@ -1,6 +1,7 @@
 # ============================================
-# FAST ENDPOINT - Wan2.1 1.3B Model
-# 5-6x faster than 14B, lower VRAM requirements
+# FAST ENDPOINT - Wan2.2 5B I2V Model
+# 2-3x faster than 14B, supports Image-to-Video!
+# VRAM: ~16-20GB (fits RTX 4090 / A10)
 # ============================================
 FROM wlsdml1114/multitalk-base:1.7 AS runtime
 

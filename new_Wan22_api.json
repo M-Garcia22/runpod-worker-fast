@@ -1,7 +1,7 @@
 {
   "122": {
     "inputs": {
-      "model": "Wan2.1_I2V_1.3B_bf16.safetensors",
+      "model": "Wan2.2_I2V_5B_fp8_scaled.safetensors",
       "base_precision": "bf16",
       "quantization": "disabled",
       "load_device": "main_device",
@@ -10,7 +10,7 @@
     },
     "class_type": "WanVideoModelLoader",
     "_meta": {
-      "title": "WanVideo Model Loader (1.3B FAST)"
+      "title": "WanVideo Model Loader (5B I2V FAST)"
     }
   },
   "129": {
@@ -27,7 +27,7 @@
     "inputs": {
       "frame_rate": 16,
       "loop_count": 0,
-      "filename_prefix": "WanVideo_Fast",
+      "filename_prefix": "WanVideo_5B_Fast",
       "format": "video/h264-mp4",
       "pix_fmt": "yuv420p",
       "crf": 19,
@@ -48,7 +48,7 @@
   "135": {
     "inputs": {
       "positive_prompt": "a person moving naturally",
-      "negative_prompt": "blurry, distorted, low quality, ugly, deformed",
+      "negative_prompt": "blurry, distorted, low quality, ugly, deformed, static, worst quality",
       "force_offload": false,
       "use_disk_cache": false,
       "device": "gpu",
@@ -135,9 +135,9 @@
   },
   "220": {
     "inputs": {
-      "steps": 20,
-      "cfg": 5.0,
-      "shift": 5.0,
+      "steps": 6,
+      "cfg": 3.0,
+      "shift": 8.0,
       "seed": 12345,
       "force_offload": false,
       "scheduler": "dpm++_2m",
@@ -199,8 +199,8 @@
   },
   "279": {
     "inputs": {
-      "lora_0": "none",
-      "strength_0": 1,
+      "lora_0": "wan22_5b_lightning.safetensors",
+      "strength_0": 1.0,
       "lora_1": "none",
       "strength_1": 1,
       "lora_2": "none",
@@ -214,22 +214,22 @@
     },
     "class_type": "WanVideoLoraSelectMulti",
     "_meta": {
-      "title": "WanVideo LoRA Select (Quality Boosters)"
+      "title": "WanVideo LoRA Select (Lightning + Custom)"
     }
   },
   "498": {
     "inputs": {
       "context_schedule": "static_standard",
-      "context_frames": 49,
+      "context_frames": 65,
       "context_stride": 4,
-      "context_overlap": 16,
+      "context_overlap": 24,
       "freenoise": true,
       "verbose": false,
       "fuse_method": "linear"
     },
     "class_type": "WanVideoContextOptions",
     "_meta": {
-      "title": "WanVideo Context Options (Optimized for 1.3B)"
+      "title": "WanVideo Context Options"
     }
   },
   "541": {
@@ -242,7 +242,7 @@
         "236",
         0
       ],
-      "num_frames": 49,
+      "num_frames": 65,
       "noise_aug_strength": 0,
       "start_latent_strength": 1,
       "end_latent_strength": 1,
