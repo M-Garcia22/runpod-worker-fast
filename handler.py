@@ -149,7 +149,7 @@ def handler(job):
         image_path = "/example_image.png"
         logger.info("Using default image: /example_image.png")
 
-    # Load workflow (1.3B uses single workflow, no FLF2V variant needed)
+    # Load workflow (5B uses single workflow, no FLF2V variant)
     prompt = load_workflow("/new_Wan22_api.json")
     
     # ============================================
@@ -168,7 +168,10 @@ def handler(job):
     context_overlap = job_input.get("context_overlap", 24)
     context_stride = job_input.get("context_stride", 4)
     
-    logger.info(f"🎞️ FAST 5B I2V: {length} frames, {steps} steps, cfg={cfg}")
+    # Generate seed
+    seed = job_input.get("seed", int(time.time() * 1000) % (2**32))
+    
+    logger.info(f"🎞️ FAST 5B I2V: {length} frames, {steps} steps, cfg={cfg}, seed={seed}")
     logger.info(f"📐 Context: {context_frames}f/{context_overlap}overlap/{context_stride}stride")
 
     # Apply to workflow
@@ -178,7 +181,7 @@ def handler(job):
     prompt["135"]["inputs"]["negative_prompt"] = job_input.get("negative_prompt", 
         "blurry, distorted, low quality, ugly, deformed, static, worst quality")
     
-    prompt["220"]["inputs"]["seed"] = job_input.get("seed", int(time.time() * 1000) % (2**32))
+    prompt["220"]["inputs"]["seed"] = seed
     prompt["220"]["inputs"]["cfg"] = cfg
     prompt["220"]["inputs"]["steps"] = steps
     

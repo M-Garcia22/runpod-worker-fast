@@ -244,8 +244,8 @@
       ],
       "num_frames": 65,
       "noise_aug_strength": 0,
-      "start_latent_strength": 1,
-      "end_latent_strength": 1,
+      "start_latent_strength": 0,
+      "end_latent_strength": 0,
       "force_offload": false,
       "fun_or_fl2v_model": false,
       "tiled_vae": false,
@@ -256,15 +256,11 @@
       "clip_embeds": [
         "193",
         0
-      ],
-      "start_image": [
-        "171",
-        0
       ]
     },
     "class_type": "WanVideoImageToVideoEncode",
     "_meta": {
-      "title": "WanVideo ImageToVideo Encode"
+      "title": "WanVideo TI2V Encode (CLIP guidance only, no VAE start_image)"
     }
   },
   "556": {

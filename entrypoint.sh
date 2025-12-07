@@ -48,8 +48,9 @@ download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/reso
 # Note: No Lightning LoRA available for 5B yet - using 20 steps
 
 # NSFW LoRA for 5B (from CivitAI - Wan 2.2 5B compatible)
+# Note: CivitAI downloads may fail without auth - endpoint will still work without it
 download_model "https://civitai.com/api/download/models/2165401?type=Model&format=SafeTensor" \
-    "/ComfyUI/models/loras/wan22_5b_nsfw.safetensors"
+    "/ComfyUI/models/loras/wan22_5b_nsfw.safetensors" || echo "⚠️ NSFW LoRA download failed - will run without it"
 
 # Shared components (same as 14B)
 download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" \
