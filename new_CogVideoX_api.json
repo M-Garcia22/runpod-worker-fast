@@ -1,7 +1,7 @@
 {
   "1": {
     "inputs": {
-      "model": "zai-org/CogVideoX-5b-I2V",
+      "model": "THUDM/CogVideoX-5b-I2V",
       "precision": "bf16",
       "fp8_fastmode": false,
       "load_device": "main_device",
@@ -18,9 +18,9 @@
       "prompt": "A woman smiling naturally, cinematic lighting",
       "strength": 1,
       "force_offload": false,
-      "pipeline": [
+      "clip": [
         "1",
-        0
+        2
       ]
     },
     "class_type": "CogVideoTextEncode",
@@ -33,9 +33,9 @@
       "prompt": "blurry, distorted, low quality, static, ugly",
       "strength": 1,
       "force_offload": false,
-      "pipeline": [
+      "clip": [
         "1",
-        0
+        2
       ]
     },
     "class_type": "CogVideoTextEncode",
@@ -73,7 +73,7 @@
   "7": {
     "inputs": {
       "enable_vae_tiling": true,
-      "image": [
+      "start_image": [
         "6",
         0
       ],
@@ -91,13 +91,13 @@
     "inputs": {
       "height": 480,
       "width": 720,
-      "num_frames": 49,
+      "num_frames": 81,
       "steps": 50,
       "cfg": 6,
       "seed": 12345,
       "scheduler": "CogVideoXDPMScheduler",
       "denoise_strength": 1,
-      "pipeline": [
+      "model": [
         "1",
         0
       ],
@@ -122,6 +122,11 @@
   "9": {
     "inputs": {
       "enable_vae_tiling": true,
+      "auto_tile_size": true,
+      "tile_sample_min_width": 240,
+      "tile_sample_min_height": 160,
+      "tile_overlap_factor_width": 0.25,
+      "tile_overlap_factor_height": 0.25,
       "samples": [
         "8",
         0
@@ -138,7 +143,7 @@
   },
   "10": {
     "inputs": {
-      "frame_rate": 8,
+      "frame_rate": 30,
       "loop_count": 0,
       "filename_prefix": "CogVideoX_I2V",
       "format": "video/h264-mp4",

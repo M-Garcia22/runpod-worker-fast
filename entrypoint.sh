@@ -13,9 +13,9 @@ echo "This will download ~21.6 GB total"
 echo "============================================"
 
 # ============================================
-# Download from zai-org repository (working mirror)
-# https://huggingface.co/zai-org/CogVideoX-5b-I2V
-# Using huggingface-cli for proper caching
+# Download from THUDM official repository
+# https://huggingface.co/THUDM/CogVideoX-5b-I2V
+# ComfyUI node only accepts THUDM model names
 # ============================================
 
 # Set HuggingFace cache directory
@@ -23,10 +23,10 @@ export HF_HOME=/root/.cache/huggingface
 mkdir -p $HF_HOME
 
 # Check if model already cached
-if [ -d "$HF_HOME/hub/models--zai-org--CogVideoX-5b-I2V" ]; then
+if [ -d "$HF_HOME/hub/models--THUDM--CogVideoX-5b-I2V" ]; then
     echo "✓ CogVideoX-5B I2V already cached"
 else
-    echo "📦 Downloading CogVideoX-5B I2V via huggingface-cli..."
+    echo "📦 Downloading THUDM/CogVideoX-5b-I2V via huggingface_hub..."
     
     # Download full model repo to HuggingFace cache
     # This ensures ComfyUI's from_pretrained() finds it
@@ -34,13 +34,31 @@ else
 from huggingface_hub import snapshot_download
 import os
 
-print('Downloading zai-org/CogVideoX-5b-I2V...')
-snapshot_download(
-    repo_id='zai-org/CogVideoX-5b-I2V',
-    local_dir_use_symlinks=False,
-    resume_download=True
-)
-print('✓ Download complete!')
+print('Downloading THUDM/CogVideoX-5b-I2V...')
+try:
+    snapshot_download(
+        repo_id='THUDM/CogVideoX-5b-I2V',
+        local_dir_use_symlinks=False,
+        resume_download=True
+    )
+    print('✓ Download complete!')
+except Exception as e:
+    print(f'⚠ THUDM download failed: {e}')
+    print('Trying zai-org mirror...')
+    # Fallback to zai-org mirror and symlink
+    snapshot_download(
+        repo_id='zai-org/CogVideoX-5b-I2V',
+        local_dir_use_symlinks=False,
+        resume_download=True
+    )
+    # Create symlink so ComfyUI finds it under THUDM name
+    import os
+    thudm_path = '/root/.cache/huggingface/hub/models--THUDM--CogVideoX-5b-I2V'
+    zai_path = '/root/.cache/huggingface/hub/models--zai-org--CogVideoX-5b-I2V'
+    if os.path.exists(zai_path) and not os.path.exists(thudm_path):
+        os.symlink(zai_path, thudm_path)
+        print('✓ Created symlink THUDM -> zai-org')
+    print('✓ Download complete via mirror!')
 "
     
     if [ $? -eq 0 ]; then

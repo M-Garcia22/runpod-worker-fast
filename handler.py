@@ -15,7 +15,7 @@ import torch
 # ============================================
 # FAST ENDPOINT - CogVideoX-5B I2V Model
 # ~2x faster than Wan 14B, proper Image-to-Video!
-# Uses zai-org/CogVideoX-5b-I2V from HuggingFace
+# Uses THUDM/CogVideoX-5b-I2V from HuggingFace
 # ============================================
 
 if torch.cuda.is_available():
@@ -154,17 +154,17 @@ def handler(job):
     
     # ============================================
     # CogVideoX-5B I2V Settings
-    # From https://huggingface.co/zai-org/CogVideoX-5b-I2V
+    # From https://huggingface.co/THUDM/CogVideoX-5b-I2V
     # - Resolution: 720x480 (fixed!)
-    # - Frames: 49 (6 seconds at 8fps)
+    # - Frames: 81 (2.7 seconds at 30fps)
     # - Steps: 50 recommended
     # ============================================
-    num_frames = job_input.get("length", 49)      # 49 frames = 6 seconds at 8fps
+    num_frames = job_input.get("length", 81)      # 81 frames = 2.7 seconds at 30fps
     steps = job_input.get("steps", 50)            # CogVideoX needs 50 steps
     cfg = job_input.get("cfg", 6.0)               # CFG scale
     seed = job_input.get("seed", int(time.time() * 1000) % (2**32))
     
-    logger.info(f"🎞️ CogVideoX-5B I2V: {num_frames} frames, {steps} steps, cfg={cfg}, seed={seed}")
+    logger.info(f"🎞️ CogVideoX-5B I2V: {num_frames} frames @ 30fps, {steps} steps, cfg={cfg}, seed={seed}")
 
     # Apply to workflow
     # Node 5: Load Image
@@ -231,6 +231,8 @@ def handler(job):
                 "generation_time": generation_time,
                 "model": "CogVideoX-5B-I2V",
                 "frames": num_frames,
+                "fps": 30,
+                "duration_seconds": round(num_frames / 30, 2),
                 "steps": steps,
                 "resolution": "720x480"
             }
