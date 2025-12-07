@@ -66,9 +66,8 @@
       "width": 720,
       "height": 480,
       "upscale_method": "lanczos",
-      "keep_proportion": true,
-      "divisible_by": 16,
-      "crop": "center",
+      "keep_proportion": false,
+      "divisible_by": 2,
       "image": [
         "5",
         0
