@@ -14,9 +14,11 @@
   },
   "11": {
     "inputs": {
-      "rel_l1_thresh": 0.2,
-      "cache_interval": 4,
-      "coefficients": "1.05, 1.05, 1.05, 1.05"
+      "start_step": 0,
+      "hf_step": 5,
+      "lf_step": 10,
+      "cache_device": "cuda",
+      "num_blocks_to_cache": 12
     },
     "class_type": "CogVideoXFasterCache",
     "_meta": {
